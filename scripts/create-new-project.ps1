@@ -76,7 +76,7 @@ if (-not $folderPattern) {
 Write-Host ""
 Write-Host "Step 4: Creating folder structure..." -ForegroundColor Yellow
 
-$projectRoot = "C:\Repo\Projects\Project-$clientName"
+$projectRoot = "c:\Repo\Projects\Project-$clientName"
 $phaseFolder = Join-Path $projectRoot "Phase $phaseNumber"
 $notesFolder = Join-Path $phaseFolder "08 - Meeting Notes"
 $scriptsFolder = Join-Path $phaseFolder "scripts"
