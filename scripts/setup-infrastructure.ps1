@@ -71,7 +71,7 @@ Write-Host "✓ All dependencies installed" -ForegroundColor Green
 # Step 7: Verify installation
 Write-Host ""
 Write-Host "Step 4: Verifying installation..." -ForegroundColor Yellow
-python -c "import fuzzywuzzy; import requests; print('✓ All imports successful')"
+& "$venvPath\Scripts\python.exe" -c 'import fuzzywuzzy; import requests; print("All imports successful")'
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERROR: Import verification failed" -ForegroundColor Red
     exit 1

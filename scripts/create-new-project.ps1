@@ -6,7 +6,6 @@ Write-Host "Create New Client Project" -ForegroundColor Cyan
 Write-Host "=====================================" -ForegroundColor Cyan
 Write-Host ""
 
-# Helper function for colored input prompts
 function Get-UserInput {
     param(
         [string]$Prompt,
@@ -14,19 +13,26 @@ function Get-UserInput {
         [switch]$IsSecret = $false
     )
 
-    $displayPrompt = if ($Default) { "$Prompt [$Default]: " } else { "$Prompt: " }
+    if ($Default) {
+        $displayPrompt = "${Prompt} [${Default}]: "
+    } else {
+        $displayPrompt = "${Prompt}: "
+    }
 
     if ($IsSecret) {
         $value = Read-Host $displayPrompt -AsSecureString
         return [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToCoTaskMemUni($value))
     } else {
         $value = Read-Host $displayPrompt
-        return if ($value) { $value } else { $Default }
+        if ($value) {
+            return $value
+        } else {
+            return $Default
+        }
     }
 }
 
-# Step 1: Gather user input
-Write-Host "Step 1: Project Information" -ForegroundColor Yellow
+Write-Host "Step 1: Client Code" -ForegroundColor Yellow
 Write-Host ""
 
 $clientName = Get-UserInput -Prompt "Client Code (e.g., TWG, BDT, Acme)" -Default "TestClient"
@@ -35,80 +41,65 @@ if (-not $clientName) {
     exit 1
 }
 
+Write-Host ""
+Write-Host "Step 2: Phase Number" -ForegroundColor Yellow
+Write-Host ""
+
 $phaseNumber = Get-UserInput -Prompt "Phase Number (1, 2, 3, etc.)" -Default "1"
 if (-not $phaseNumber -match '^\d+$') {
     Write-Host "ERROR: Phase must be a number" -ForegroundColor Red
     exit 1
 }
 
-Write-Host ""
-Write-Host "Step 2: Asana Configuration" -ForegroundColor Yellow
-Write-Host ""
-
-$asanaGID = Get-UserInput -Prompt "Asana Project GID (from URL: https://app.asana.com/0/WORKSPACE/[THIS])"
-if (-not $asanaGID) {
-    Write-Host "ERROR: Asana GID is required" -ForegroundColor Red
-    exit 1
-}
-
-$asanaPAT = Get-UserInput -Prompt "Your ASANA_PAT (from: https://app.asana.com/-/profile_options/apps)" -IsSecret
-if (-not $asanaPAT) {
-    Write-Host "ERROR: ASANA_PAT is required" -ForegroundColor Red
-    exit 1
-}
-
-Write-Host ""
-Write-Host "Step 3: Notes Folder Configuration" -ForegroundColor Yellow
-Write-Host ""
-Write-Host "Which folders contain your meeting notes?" -ForegroundColor Gray
-Write-Host "Examples:" -ForegroundColor Gray
-Write-Host "  - Single folder: '08 - Meeting Notes'" -ForegroundColor Gray
-Write-Host "  - Multiple: '08 - Meeting Notes|02 - Business Requirements|04 - Technical Requirements'" -ForegroundColor Gray
-Write-Host ""
-
-$folderPattern = Get-UserInput -Prompt "Folder Pattern" -Default "08 - Meeting Notes"
-if (-not $folderPattern) {
-    Write-Host "ERROR: Folder pattern is required" -ForegroundColor Red
-    exit 1
-}
-
-# Step 2: Create folder structure
-Write-Host ""
-Write-Host "Step 4: Creating folder structure..." -ForegroundColor Yellow
+$folderPattern = "08 - Meeting Notes"
 
 $projectRoot = "c:\Repo\Projects\Project-$clientName"
 $phaseFolder = Join-Path $projectRoot "Phase $phaseNumber"
-$notesFolder = Join-Path $phaseFolder "08 - Meeting Notes"
-$scriptsFolder = Join-Path $phaseFolder "scripts"
 
-try {
-    # Create folders
-    if (-not (Test-Path $phaseFolder)) {
-        New-Item -ItemType Directory -Path $phaseFolder -Force | Out-Null
-        Write-Host "✓ Created: $phaseFolder" -ForegroundColor Green
-    } else {
-        Write-Host "✓ Already exists: $phaseFolder" -ForegroundColor Green
+# Check if folder structure already exists
+if (Test-Path $phaseFolder) {
+    Write-Host ""
+    Write-Host "WARNING: Project folder already exists at: $phaseFolder" -ForegroundColor Yellow
+    $response = Read-Host "Overwrite and recreate folder structure? (yes/no)"
+    if ($response -ne "yes") {
+        Write-Host "Cancelled. Folder not modified." -ForegroundColor Yellow
+        exit 0
     }
+}
 
-    if (-not (Test-Path $notesFolder)) {
-        New-Item -ItemType Directory -Path $notesFolder -Force | Out-Null
-        Write-Host "✓ Created: $notesFolder" -ForegroundColor Green
-    } else {
-        Write-Host "✓ Already exists: $notesFolder" -ForegroundColor Green
-    }
+Write-Host ""
+Write-Host "Step 3: Asana Project GID (optional)" -ForegroundColor Yellow
+Write-Host ""
 
-    if (-not (Test-Path $scriptsFolder)) {
-        New-Item -ItemType Directory -Path $scriptsFolder -Force | Out-Null
-        Write-Host "✓ Created: $scriptsFolder" -ForegroundColor Green
-    } else {
-        Write-Host "✓ Already exists: $scriptsFolder" -ForegroundColor Green
+$asanaGID = Get-UserInput -Prompt "Asana Project GID (from URL, or press Enter to skip)" -Default ""
+Write-Host "  (Asana GID: $asanaGID)" -ForegroundColor Gray
+
+Write-Host ""
+Write-Host "Step 4: Asana Personal Access Token (optional)" -ForegroundColor Yellow
+Write-Host ""
+
+$asanaPAT = Get-UserInput -Prompt "Your ASANA_PAT (or press Enter to skip)" -Default ""
+Write-Host "  (Token provided: $(if ($asanaPAT) { 'yes' } else { 'no' }))" -ForegroundColor Gray
+
+# Call ClientProjectTemplate to create folder structure and templates
+Write-Host ""
+Write-Host "Creating folder structure with templates..." -ForegroundColor Cyan
+
+$clientProjectTemplatePath = "C:\Repo\NemesisProject\ClientProjectTemplate\create-structure.bat"
+if (Test-Path $clientProjectTemplatePath) {
+    & $clientProjectTemplatePath $clientName $phaseNumber $folderPattern $asanaGID $asanaPAT
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "ERROR: Failed to create project structure" -ForegroundColor Red
+        exit 1
     }
-} catch {
-    Write-Host "ERROR: Failed to create folders: $_" -ForegroundColor Red
+} else {
+    Write-Host "ERROR: ClientProjectTemplate not found at: $clientProjectTemplatePath" -ForegroundColor Red
     exit 1
 }
 
-# Step 3: Create .env file
+$notesFolder = Join-Path $phaseFolder "08 - Meeting Notes"
+$scriptsFolder = Join-Path $phaseFolder "scripts"
+
 Write-Host ""
 Write-Host "Step 5: Creating configuration files..." -ForegroundColor Yellow
 
@@ -116,13 +107,12 @@ $envFile = Join-Path $projectRoot ".env"
 try {
     $envContent = "ASANA_PAT=$asanaPAT`n"
     Set-Content -Path $envFile -Value $envContent -Encoding UTF8
-    Write-Host "✓ Created: .env" -ForegroundColor Green
+    Write-Host "[+] Created: .env" -ForegroundColor Green
 } catch {
     Write-Host "ERROR: Failed to create .env: $_" -ForegroundColor Red
     exit 1
 }
 
-# Step 4: Create .claude/settings.json
 $claudeFolder = Join-Path $projectRoot ".claude"
 $settingsFile = Join-Path $claudeFolder "settings.json"
 
@@ -131,72 +121,62 @@ try {
         New-Item -ItemType Directory -Path $claudeFolder -Force | Out-Null
     }
 
-    # Get the NemesisProject scripts path
     $nemesisScriptPath = "C:\Repo\NemesisProject\scripts\asana-sync-enhanced.py"
+    $escapedPath = $nemesisScriptPath -replace '\\', '\\'
 
-    # Escape backslashes for JSON
-    $scriptPath = $nemesisScriptPath -replace '\\', '\\'
+    $hookCommand = "python `"$nemesisScriptPath`" --no-prompt --project-gid $asanaGID"
 
-    $settingsContent = @"
-{
-  "version": "1.0",
-  "hooks": [
-    {
-      "on": "file_write",
-      "match": "**/$folderPattern/**/*.md",
-      "run": "python $nemesisScriptPath --no-prompt --project-gid $asanaGID"
-    }
-  ]
-}
-"@
+    $settingsJson = @{
+        version = "1.0"
+        hooks = @(
+            @{
+                on = "file_write"
+                match = "**/$folderPattern/**/*.md"
+                run = $hookCommand
+            }
+        )
+    } | ConvertTo-Json -Depth 10
 
-    Set-Content -Path $settingsFile -Value $settingsContent -Encoding UTF8
-    Write-Host "✓ Created: .claude/settings.json" -ForegroundColor Green
+    Set-Content -Path $settingsFile -Value $settingsJson -Encoding UTF8
+    Write-Host "[+] Created: .claude/settings.json" -ForegroundColor Green
 } catch {
     Write-Host "ERROR: Failed to create settings.json: $_" -ForegroundColor Red
     exit 1
 }
 
-# Step 5: Create .gitignore
 $gitignoreFile = Join-Path $projectRoot ".gitignore"
 try {
     $gitignoreContent = ".env`nvenv/`n__pycache__/`n*.pyc`n.DS_Store`n"
     Set-Content -Path $gitignoreFile -Value $gitignoreContent -Encoding UTF8
-    Write-Host "✓ Created: .gitignore" -ForegroundColor Green
+    Write-Host "[+] Created: .gitignore" -ForegroundColor Green
 } catch {
     Write-Host "ERROR: Failed to create .gitignore: $_" -ForegroundColor Red
     exit 1
 }
 
-# Step 6: Create project README
 $projectReadmeFile = Join-Path $phaseFolder "README.md"
 try {
-    $projectReadmeContent = @"
-# Project-$clientName — Phase $phaseNumber
+    $readmeContent = @"
+# Project-$clientName - Phase $phaseNumber
 
 **Asana Project GID:** $asanaGID
 
 ## Getting Started
 
-1. Drop meeting notes into: `$notesFolder`
+1. Drop meeting notes into: $notesFolder
 2. Notes are automatically synced to Asana
-3. Write naturally — auto-detection finds task references
-4. Or use explicit: `@task search:"Task Name"`
+3. Write naturally - auto-detection finds task references
 
 ## How Auto-Detection Works
 
 ### Automatic (No Special Syntax Required)
-\`\`\`markdown
 Bloomberg integration complete. Ready for production.
-\`\`\`
-→ Auto-syncs to the Bloomberg task
+-> Auto-syncs to the Bloomberg task
 
 ### Explicit (Always Works)
-\`\`\`markdown
 @task search:"Task Name"
 Your comment here.
-\`\`\`
-→ Explicitly syncs to specified task
+-> Explicitly syncs to specified task
 
 ## File Location
 
@@ -205,50 +185,46 @@ All notes should go in: **08 - Meeting Notes**
 Subfolders within are OK:
 - 08 - Meeting Notes/Client Meetings/
 - 08 - Meeting Notes/Internal/
-- etc.
 
 ## Manual Sync
 
 If you want to sync without using hooks:
 
-\`\`\`bash
 cd $projectRoot
 python C:\Repo\NemesisProject\scripts\asana-sync-enhanced.py --dry-run
-\`\`\`
 
 ## Configuration
 
 Your settings are stored in:
-- `.env` — Your ASANA_PAT (never commit this)
-- `.claude/settings.json` — Hook configuration
+- .env - Your ASANA_PAT (never commit this)
+- .claude/settings.json - Hook configuration
 
 ## Troubleshooting
 
-**Hook not firing?**
+Hook not firing?
 - Save .claude/settings.json to re-enable
 
-**ASANA_PAT error?**
+ASANA_PAT error?
 - Check .env file has your token
 
-**Wrong task synced?**
+Wrong task synced?
 - Use explicit @task syntax for clarity
 
 ---
 
-**Ready to use. Start writing notes!**
+Ready to use. Start writing notes!
 "@
 
-    Set-Content -Path $projectReadmeFile -Value $projectReadmeContent -Encoding UTF8
-    Write-Host "✓ Created: Phase folder README" -ForegroundColor Green
+    Set-Content -Path $projectReadmeFile -Value $readmeContent -Encoding UTF8
+    Write-Host "[+] Created: Phase folder README" -ForegroundColor Green
 } catch {
     Write-Host "ERROR: Failed to create project README: $_" -ForegroundColor Red
     exit 1
 }
 
-# Step 7: Create test note
 $testNoteFile = Join-Path $notesFolder "Test_AutoDetect.md"
 try {
-    $testNoteContent = @"
+    $testContent = @"
 # Test Auto-Detection
 
 This file tests the auto-detection system.
@@ -267,20 +243,19 @@ Manual reference works.
 
 ---
 
-**Test:** Run \`python C:\Repo\NemesisProject\scripts\asana-sync-enhanced.py --dry-run\` to see proposals.
+Test: Run python C:\Repo\NemesisProject\scripts\asana-sync-enhanced.py --dry-run to see proposals.
 "@
 
-    Set-Content -Path $testNoteFile -Value $testNoteContent -Encoding UTF8
-    Write-Host "✓ Created: Test note file" -ForegroundColor Green
+    Set-Content -Path $testNoteFile -Value $testContent -Encoding UTF8
+    Write-Host "[+] Created: Test note file" -ForegroundColor Green
 } catch {
     Write-Host "ERROR: Failed to create test note: $_" -ForegroundColor Red
     exit 1
 }
 
-# Success
 Write-Host ""
 Write-Host "=====================================" -ForegroundColor Green
-Write-Host "✓ Project Created Successfully!" -ForegroundColor Green
+Write-Host "[OK] Project Created Successfully!" -ForegroundColor Green
 Write-Host "=====================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "Project Details:" -ForegroundColor Cyan
@@ -299,7 +274,7 @@ Write-Host "  cd '$projectRoot'" -ForegroundColor Gray
 Write-Host "  python C:\Repo\NemesisProject\scripts\asana-sync-enhanced.py --dry-run" -ForegroundColor Gray
 Write-Host ""
 Write-Host "Files Created:" -ForegroundColor Cyan
-Write-Host "  .env (your token — never commit)" -ForegroundColor Gray
+Write-Host "  .env (your token - never commit)" -ForegroundColor Gray
 Write-Host "  .claude/settings.json (hook config)" -ForegroundColor Gray
 Write-Host "  .gitignore (protect secrets)" -ForegroundColor Gray
 Write-Host "  README.md (project guide)" -ForegroundColor Gray

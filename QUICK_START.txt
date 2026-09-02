@@ -1,0 +1,102 @@
+================================================================================
+                    NEMESIS PROJECT - QUICK START
+================================================================================
+
+THIS IS SIMPLE. THREE STEPS. THAT'S IT.
+
+
+STEP 1: SETUP (ONE TIME ONLY)
+================================================================================
+
+Double-click this file:
+    1-SETUP-INFRASTRUCTURE.bat
+
+Wait for the message: "Setup Complete!"
+
+Then press any key to close.
+
+DONE WITH STEP 1.
+
+
+STEP 2: CREATE YOUR PROJECT
+================================================================================
+
+Double-click this file:
+    2-CREATE-PROJECT.bat
+
+Answer these questions:
+
+    1. Client Code (like: TWG, BDT, Acme)
+       Just type it and press ENTER
+
+    2. Phase Number (like: 1, 2, or 3)
+       Just type the number and press ENTER
+
+    3. Asana Project GID
+       Go to Asana, open your project, copy the big number in the URL
+       Paste it and press ENTER
+
+    4. Your ASANA_PAT (Personal Access Token)
+       Go here: https://app.asana.com/-/profile_options/apps
+       Click "Create new token"
+       Give it a name like "Nemesis"
+       Copy the token
+       Paste it and press ENTER
+
+    5. Folder Pattern (where your notes are)
+       Just press ENTER (uses default: "08 - Meeting Notes")
+
+Wait for: "Project Created Successfully!"
+
+Then press any key to close.
+
+DONE WITH STEP 2.
+
+
+STEP 3: VERIFY IT WORKS (OPTIONAL)
+================================================================================
+
+Double-click this file:
+    3-CHECK-ASANA.bat
+
+This checks everything is connected.
+
+Should show green checkmarks.
+
+Press any key to close.
+
+DONE WITH STEP 3.
+
+
+NOW USE IT
+================================================================================
+
+1. Open File Explorer
+
+2. Go to: c:\Repo\Projects\Project-<YourClientName>\Phase <N>\
+
+3. Open the folder: 08 - Meeting Notes
+
+4. Create a new file: MyNotes.md
+
+5. Write something like:
+       Meeting with Bloomberg team went well. Integration testing complete.
+
+6. Save the file.
+
+7. MAGIC: Your notes automatically sync to Asana!
+
+Done.
+
+
+THAT'S IT
+================================================================================
+
+No code.
+No command line.
+No passwords.
+No hassle.
+
+Questions? See the README.md file.
+
+================================================================================
