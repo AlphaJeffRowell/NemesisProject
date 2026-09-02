@@ -1,0 +1,175 @@
+================================================================================
+                    NEMESIS PROJECT — START HERE
+================================================================================
+
+Welcome! This is a complete, automated Asana integration system for syncing
+meeting notes to Asana tasks with auto-detection (no special syntax required).
+
+================================================================================
+                              QUICK START (3 STEPS)
+================================================================================
+
+Step 1: ONE-TIME INFRASTRUCTURE SETUP
+-------------------------------------
+Run this ONCE on your machine to set up Python and dependencies:
+
+    cd C:\Repo\NemesisProject
+    .\scripts\setup-infrastructure.ps1
+
+(Takes ~5 minutes. Follow on-screen prompts.)
+
+
+Step 2: CREATE YOUR FIRST CLIENT PROJECT
+-----------------------------------------
+Run this to create a new client project (e.g., Project-TWG):
+
+    .\scripts\create-new-project.ps1
+
+(Prompts you for: Client Name, Phase, Asana GID, Token, Folder Pattern)
+(Creates all files and folders automatically)
+
+
+Step 3: START WRITING NOTES
+----------------------------
+Drop notes into your project's "08 - Meeting Notes" folder.
+They sync to Asana automatically!
+
+    c:\Repo\Projects\Project-<Client>\Phase <N>\08 - Meeting Notes\
+
+================================================================================
+                              DOCUMENTATION
+================================================================================
+
+Start with these in order:
+
+1. README.md
+   ├─ Overview
+   ├─ Quick start summary
+   └─ Architecture
+
+2. docs/SETUP.md
+   ├─ Detailed infrastructure setup
+   ├─ Python installation
+   └─ Troubleshooting setup
+
+3. docs/AUTO_DETECTION.md
+   ├─ How auto-detection works
+   ├─ Examples
+   ├─ Best practices
+   └─ Configuration
+
+4. docs/TROUBLESHOOTING.md
+   ├─ Common issues
+   ├─ Error messages
+   └─ Solutions
+
+================================================================================
+                              DEPLOYMENT
+                         (Ready to push to GitHub!)
+================================================================================
+
+This project is ready to deploy. Everything is included:
+
+✅ Main Asana sync script (asana-sync-enhanced.py)
+✅ Auto-detection with fuzzy matching
+✅ Setup automation scripts (PowerShell)
+✅ Complete documentation
+✅ Configuration templates
+✅ Troubleshooting guide
+
+To push to GitHub:
+
+    cd C:\Repo\NemesisProject
+    git init
+    git add .
+    git commit -m "Initial Nemesis Project setup"
+    git remote add origin https://github.com/your-org/NemesisProject.git
+    git push -u origin main
+
+================================================================================
+                              FILE STRUCTURE
+================================================================================
+
+NemesisProject\
+├── README.md                    ← Start here (overview)
+├── START_HERE.txt              ← This file
+├── DEPLOYMENT_SUMMARY.md       ← What was created
+├── requirements.txt            ← Python dependencies
+├── .gitignore                  ← Git ignore patterns
+│
+├── scripts\
+│   ├── setup-infrastructure.ps1  ← Run once to set up
+│   ├── create-new-project.ps1    ← Run to create projects
+│   └── asana-sync-enhanced.py    ← Main script (with auto-detection)
+│
+└── docs\
+    ├── SETUP.md                  ← Infrastructure setup
+    ├── AUTO_DETECTION.md         ← How auto-detection works
+    └── TROUBLESHOOTING.md        ← Common issues
+
+================================================================================
+                              KEY FEATURES
+================================================================================
+
+✓ AUTO-DETECTION
+  Write naturally: "Bloomberg integration complete"
+  System finds: "Bloomberg Integration #27" and syncs automatically
+
+✓ BACKWARD COMPATIBLE
+  Explicit @task syntax still works and takes priority:
+  @task search:"Task Name"
+
+✓ MULTI-USER
+  Each user has personal ASANA_PAT (never shared or committed)
+
+✓ CLAUDE CODE HOOKS
+  File saved → Sync happens automatically
+
+✓ FUZZY MATCHING
+  Confidence scoring disambiguates multiple matches
+
+✓ ZERO MANUAL SETUP
+  Scripts automate everything — no file editing needed
+
+================================================================================
+                              SYSTEM REQUIREMENTS
+================================================================================
+
+For each user/machine:
+- Windows 10+, macOS, or Linux
+- Python 3.7+ (script checks and guides installation)
+- ~500MB disk space
+- Internet connection
+- Asana account with Personal Access Token
+
+================================================================================
+                              NEXT STEPS
+================================================================================
+
+1. Read: README.md (2 minutes)
+2. Run: .\scripts\setup-infrastructure.ps1 (5 minutes)
+3. Run: .\scripts\create-new-project.ps1 (2 minutes)
+4. Push to GitHub (when ready)
+5. Share repo link with team
+
+================================================================================
+                              SUPPORT
+================================================================================
+
+Problems?
+→ Check docs/TROUBLESHOOTING.md
+
+Questions about auto-detection?
+→ Check docs/AUTO_DETECTION.md
+
+How to set up infrastructure?
+→ Check docs/SETUP.md
+
+Everything else?
+→ See README.md
+
+================================================================================
+
+Ready to go! Start with: README.md
+
+================================================================================
