@@ -47,6 +47,8 @@ DONE WITH STEP 2.
 
 What it did:
   - Created project folders (00-08)
+  - Projects folder created: ..\Projects\Project-<ClientCode>\
+  - Auto-detection: Works from ANY folder location (no C:\Repo\ needed!)
   - Set up auto-processing for meeting notes
   - Ready to go
 

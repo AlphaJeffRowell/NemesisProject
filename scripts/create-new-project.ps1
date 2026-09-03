@@ -1,9 +1,16 @@
 # Nemesis Project — Create New Client Project
 # Creates folder structure for client projects (no Asana config needed - MCP handles sync)
 
+# Auto-detect Nemesis Project root folder
+$nemesisRoot = Split-Path -Parent $PSScriptRoot
+$projectsRoot = Join-Path $nemesisRoot "Projects"
+
 Write-Host "=====================================" -ForegroundColor Cyan
 Write-Host "Create New Client Project" -ForegroundColor Cyan
 Write-Host "=====================================" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Nemesis Root:   $nemesisRoot" -ForegroundColor Gray
+Write-Host "Projects Root:  $projectsRoot" -ForegroundColor Gray
 Write-Host ""
 
 function Get-UserInput {
@@ -52,7 +59,7 @@ if (-not $phaseNumber -match '^\d+$') {
 }
 
 $folderPattern = "08 - Meeting Notes"
-$projectRoot = "c:\Repo\Projects\Project-$clientName"
+$projectRoot = Join-Path $projectsRoot "Project-$clientName"
 $phaseFolder = Join-Path $projectRoot "Phase $phaseNumber"
 
 # Check if folder structure already exists
@@ -70,7 +77,7 @@ if (Test-Path $phaseFolder) {
 Write-Host ""
 Write-Host "Creating folder structure..." -ForegroundColor Cyan
 
-$clientProjectTemplatePath = "C:\Repo\NemesisProject\ClientProjectTemplate\create-structure.bat"
+$clientProjectTemplatePath = Join-Path $nemesisRoot "ClientProjectTemplate\create-structure.bat"
 if (Test-Path $clientProjectTemplatePath) {
     & $clientProjectTemplatePath $clientName $phaseNumber $folderPattern
     if ($LASTEXITCODE -ne 0) {

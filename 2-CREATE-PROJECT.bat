@@ -40,8 +40,11 @@ if %errorlevel% equ 0 (
     echo  Project Created Successfully!
     echo ============================================================
     echo.
-    echo Your project is ready to use. Start dropping notes into:
-    echo   c:\Repo\Projects\Project-^<ClientName^>\Phase ^<N^>\08 - Meeting Notes\
+    echo Your project is ready to use. Start in Claude Code with:
+    echo   New session meeting notes ^<ClientName^>
+    echo.
+    echo Files will be created automatically in:
+    echo   %SCRIPT_DIR%..\Projects\Project-^<ClientName^>\Phase ^<N^>\08 - Meeting Notes\
     echo.
 ) else (
     echo.
