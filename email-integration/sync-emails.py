@@ -2,6 +2,7 @@
 """
 Nemesis Project — Email to Notes Sync (Mock Test Version)
 Tests routing logic before real connector integration
+UPDATED: Subject line only (no CC/BCC check required)
 """
 
 import os
@@ -22,53 +23,45 @@ except ImportError:
 class MockEmail:
     """Represents a mock email for testing"""
 
-    def __init__(
-        self, sender: str, subject: str, body: str, received_time: str, has_target_email: bool = True
-    ):
+    def __init__(self, sender: str, subject: str, body: str, received_time: str):
         self.sender = sender
         self.subject = subject
         self.body = body
         self.received_time = received_time
-        self.has_target_email = has_target_email  # CC/BCC check
 
 
 def generate_mock_emails() -> List[MockEmail]:
-    """Generate test emails"""
+    """Generate test emails - subject line only matters now"""
     return [
         MockEmail(
             sender="jeff.rowell@alphafmc.com",
             subject="[ThyNemesis] Q4 Planning Meeting",
             body="Met with project team today.\nDiscussed integration timeline.\nReady for Phase 2.",
             received_time="2026-09-02 14:30:00",
-            has_target_email=True,
         ),
         MockEmail(
             sender="sarah.smith@alphafmc.com",
             subject="[ThyNemesis] Technical Requirements Review",
             body="Reviewed tech specs for implementation.\nApproved for development.\nReady to start.",
             received_time="2026-09-02 13:45:00",
-            has_target_email=True,
         ),
         MockEmail(
             sender="john.doe@alphafmc.com",
             subject="ThyNemesis-Phase1 Architecture Discussion",
             body="Finalized system architecture.\nReady for development phase.\nDocs uploaded to SharePoint.",
             received_time="2026-09-02 11:20:00",
-            has_target_email=True,
         ),
         MockEmail(
             sender="alice.johnson@alphafmc.com",
             subject="Meeting Notes - No Project Tag",
             body="This email has no project tag.\nShould be skipped.",
             received_time="2026-09-02 10:00:00",
-            has_target_email=True,
         ),
         MockEmail(
             sender="bob.wilson@alphafmc.com",
             subject="[INVALID_PROJECT_XYZ] Some Meeting",
             body="This project doesn't exist.\nShould be skipped.",
             received_time="2026-09-02 09:30:00",
-            has_target_email=True,
         ),
     ]
 
@@ -133,7 +126,6 @@ class EmailProcessor:
 
     MEETING_NOTES_FOLDER = "08 - Meeting Notes"
     DOCUMENTATION_FOLDER = "07 - Documentation"
-    TARGET_EMAIL = "meetingNotes@Alphafmc.com"
 
     def __init__(self):
         self.project_finder = ProjectFinder()
@@ -190,14 +182,10 @@ class EmailProcessor:
     def process_email(self, email: MockEmail) -> Tuple[bool, str]:
         """Process single email and save to project. Returns (success, message)"""
         try:
-            # Check if email has target
-            if not email.has_target_email:
-                return False, f"[SKIP] {email.subject} - No {self.TARGET_EMAIL} in CC/BCC"
-
-            # Extract project name
+            # Extract project name from subject (only check subject now)
             project_name = self.extract_project_name(email.subject)
             if not project_name:
-                return False, f"[SKIP] {email.subject} - No [ProjectName] or ProjectName-PhaseN tag"
+                return False, f"[SKIP] {email.subject} - No [ProjectName] or ProjectName-PhaseN in subject"
 
             # Find project
             project_path = self.project_finder.find_project(project_name)
@@ -222,7 +210,7 @@ class EmailProcessor:
             note_path.write_text(markdown_content, encoding="utf-8")
 
             rel_path = note_path.relative_to(project_path)
-            return True, f"[OK] {project_name} → {rel_path}"
+            return True, f"[OK] {project_name} > {rel_path}"
 
         except Exception as e:
             return False, f"[ERROR] {email.subject} - {e}"
@@ -244,6 +232,8 @@ def main():
     print("")
 
     print(f"Processing {len(mock_emails)} mock emails...")
+    print("")
+    print("(Checking SUBJECT LINE ONLY - no CC/BCC required)")
     print("")
 
     success_count = 0

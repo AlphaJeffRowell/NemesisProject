@@ -2,10 +2,12 @@
                     NEMESIS PROJECT - QUICK START
 ================================================================================
 
-THIS IS SIMPLE. THREE STEPS. THAT'S IT.
+THIS IS SIMPLE. TWO SETUP STEPS. THEN JUST TYPE.
+
+NO FILES TO CREATE. NO TOKENS. NO HASSLE.
 
 
-STEP 1: SETUP (ONE TIME ONLY)
+STEP 1: SETUP PYTHON (ONE TIME ONLY)
 ================================================================================
 
 Double-click this file:
@@ -16,6 +18,11 @@ Wait for the message: "Setup Complete!"
 Then press any key to close.
 
 DONE WITH STEP 1.
+
+What it did:
+  - Checked if Python is installed (auto-installs if missing)
+  - Created a Python environment
+  - Installed email dependencies
 
 
 STEP 2: CREATE YOUR PROJECT
@@ -32,61 +39,125 @@ Answer these questions:
     2. Phase Number (like: 1, 2, or 3)
        Just type the number and press ENTER
 
-    3. Asana Project GID
-       Go to Asana, open your project, copy the big number in the URL
-       Paste it and press ENTER
-
-    4. Your ASANA_PAT (Personal Access Token)
-       Go here: https://app.asana.com/-/profile_options/apps
-       Click "Create new token"
-       Give it a name like "Nemesis"
-       Copy the token
-       Paste it and press ENTER
-
-    5. Folder Pattern (where your notes are)
-       Just press ENTER (uses default: "08 - Meeting Notes")
-
 Wait for: "Project Created Successfully!"
 
 Then press any key to close.
 
 DONE WITH STEP 2.
 
+What it did:
+  - Created project folders (00-08)
+  - Set up auto-processing for meeting notes
+  - Ready to go
 
-STEP 3: VERIFY IT WORKS (OPTIONAL)
+
+NOW USE IT - SUPER SIMPLE
+================================================================================
+
+Open Claude Code. Type naturally:
+
+    New session meeting notes TWG
+
+    Met with team on 2026-09-03.
+
+    Discussed:
+    - Q4 timeline confirmed
+    - Technical requirements approved
+
+    Action items:
+    - Update project plan
+    - Schedule review meeting
+
+
+THAT'S IT.
+
+System automatically:
+  1. Creates a file in: Project-TWG/Phase 1/08 - Meeting Notes/
+  2. Parses your notes (extracts action items, discussions)
+  3. Searches Asana for matching tasks
+  4. Shows you confirmation prompts:
+
+     Line 1: "Q4 timeline confirmed"
+     Detected: "Q4 Planning" (GID: 123456)
+     → Is this correct? [YES/NO]
+
+  5. You confirm (YES or NO for each)
+  6. System posts to Asana automatically
+
+
+EXAMPLE: FROM INPUT TO DONE
+================================================================================
+
+YOU TYPE:
+    New session meeting notes BDT
+
+    Meeting results:
+    - Database migration tested
+    - API endpoints reviewed
+    - Security signed off
+
+    Next steps:
+    - Deploy to staging
+    - Notify stakeholders
+
+SYSTEM SHOWS:
+    Line 1: "Database migration tested"
+    Detected: "Database Migration" (GID: 987654)
+    → Correct? [YES/NO]
+
+YOU TYPE: YES
+
+    Line 2: "API endpoints reviewed"
+    Detected: "API Review" (GID: 987655)
+    → Correct? [YES/NO]
+
+YOU TYPE: YES
+
+    Line 3: "Security signed off"
+    Detected: "Security Approval" (GID: 987656)
+    → Correct? [YES/NO]
+
+YOU TYPE: YES
+
+    Line 4: "Deploy to staging"
+    Detected: "Deployment" (GID: 987657)
+    → Correct? [YES/NO]
+
+YOU TYPE: YES
+
+    Line 5: "Notify stakeholders"
+    Detected: "Communication" (GID: 987658)
+    → Correct? [YES/NO]
+
+YOU TYPE: YES
+
+SYSTEM SHOWS:
+    ✓ Processed 5 items
+    ✓ Posted to 5 Asana tasks
+    ✓ File saved to: Project-BDT/Phase 1/08 - Meeting Notes/2026-09-03-Meeting-Notes.md
+
+DONE.
+
+
+NO FILE CREATION BY YOU. ZERO MANUAL STEPS.
+================================================================================
+
+That's the entire workflow.
+
+You just type. System does everything else.
+
+
+OPTIONAL: VERIFY IT WORKS
 ================================================================================
 
 Double-click this file:
     3-CHECK-ASANA.bat
 
-This checks everything is connected.
+This checks Asana MCP connector is available.
 
 Should show green checkmarks.
 
 Press any key to close.
-
-DONE WITH STEP 3.
-
-
-NOW USE IT
-================================================================================
-
-1. Open File Explorer
-
-2. Go to: c:\Repo\Projects\Project-<YourClientName>\Phase <N>\
-
-3. Open the folder: 08 - Meeting Notes
-
-4. Create a new file: MyNotes.md
-
-5. Write something like:
-       Meeting with Bloomberg team went well. Integration testing complete.
-
-6. Save the file.
-
-7. MAGIC: Your notes automatically sync to Asana!
-
-Done.
 
 
 THAT'S IT
@@ -94,9 +165,19 @@ THAT'S IT
 
 No code.
 No command line.
+No tokens.
 No passwords.
+No file creation.
 No hassle.
 
-Questions? See the README.md file.
+Just type naturally and confirm matches.
+
+
+QUESTIONS?
+================================================================================
+
+See: README.md for detailed docs
+See: MEETING-NOTES-WORKFLOW.md for complete workflow
+See: docs/TROUBLESHOOTING.md for common issues
 
 ================================================================================

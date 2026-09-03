@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "hooks": [
+    {
+      "on": "file_write",
+      "match": "**/08 - Meeting Notes/**/*.md",
+      "description": "Auto-process meeting notes on file save",
+      "run": "auto-sync-meeting-notes"
+    }
+  ]
+}

@@ -4,9 +4,7 @@
 param(
     [string]$ClientName,
     [string]$PhaseNumber,
-    [string]$FolderPattern,
-    [string]$AsanaGID,
-    [string]$AsanaPAT
+    [string]$FolderPattern
 )
 
 # Get template directory

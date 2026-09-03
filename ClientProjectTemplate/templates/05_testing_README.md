@@ -1,21 +1,20 @@
 # Testing
 
-This section contains testing plans and results.
+This section contains test cases, test results, and testing documentation.
 
 ## Contents
 
-- Test strategy
-- Test plans
-- Test cases
-- Test results
-- Bug reports
-- Performance testing results
-- Security testing results
-- UAT coordination
+- Unit test cases
+- Integration test cases
+- System test cases
+- UAT test cases
+- Test results and reports
+- Test coverage metrics
+- Known issues and bugs
 
 ## Getting Started
 
-Add your testing documentation here.
+Document all test cases and test results here. Include test data, test procedures, and actual test results.
 
 ---
 

@@ -30,9 +30,6 @@ echo.
 echo You will be prompted for:
 echo   - Client Name (e.g., TWG, BDT, Acme)
 echo   - Phase Number (1, 2, 3, etc.)
-echo   - Asana Project GID
-echo   - Your ASANA_PAT (personal token)
-echo   - Folder Pattern (where your notes are)
 echo.
 
 powershell -NoProfile -ExecutionPolicy Bypass -Command "& '.\scripts\create-new-project.ps1'"

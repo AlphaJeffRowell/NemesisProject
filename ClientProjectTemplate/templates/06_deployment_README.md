@@ -1,20 +1,20 @@
 # Deployment
 
-This section contains deployment planning and execution.
+This section contains deployment guides and checklists.
 
 ## Contents
 
-- Deployment plan
-- Pre-deployment checklist
 - Deployment procedures
-- Rollback procedures
+- Environment setup guides
+- Pre-deployment checklist
 - Post-deployment verification
-- Go-live coordination
-- Maintenance procedures
+- Rollback procedures
+- Known deployment issues
+- Release notes
 
 ## Getting Started
 
-Add your deployment documentation here.
+Document the steps needed to deploy the solution to production. Include environment setup, configuration, and verification steps.
 
 ---
 

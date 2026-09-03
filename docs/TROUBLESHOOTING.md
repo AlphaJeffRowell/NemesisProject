@@ -1,314 +1,386 @@
 # Troubleshooting Guide
 
+**Something not working?** Find your issue below and follow the fix.
+
+---
+
 ## Setup Issues
 
-### "Python not found"
+### Python Won't Install
 
-**Error:** `python command not found` or similar
+**Problem:** `1-SETUP-INFRASTRUCTURE.bat` says "ERROR: Python not found"
 
 **Solution:**
-1. Install Python from: https://www.python.org/downloads/
-2. **IMPORTANT:** During installation, check "Add Python to PATH"
-3. Close and reopen PowerShell
-4. Run setup script again
+1. Install Python manually: https://www.python.org/downloads/
+2. **CRITICAL:** During installation, check **"Add Python to PATH"**
+3. Close ALL command prompts and PowerShell windows
+4. Restart your computer
+5. Run `1-SETUP-INFRASTRUCTURE.bat` again
 
-**Verify:**
-```powershell
-python --version
-```
-
-Should show Python 3.7 or higher.
+**If still failing:**
+- Open Command Prompt
+- Type: `python --version`
+- Should show: `Python 3.X.X`
+- If not, Python isn't in PATH — reinstall and check the box
 
 ---
 
-### "pip not found"
+### Setup Hangs or Freezes
 
-**Error:** `pip command not found`
+**Problem:** `1-SETUP-INFRASTRUCTURE.bat` starts but never finishes
 
 **Solution:**
-```powershell
-python -m pip --version
-```
+1. Close the window (Ctrl+C)
+2. Delete the venv folder: `C:\Repo\NemesisProject\venv`
+3. Run `1-SETUP-INFRASTRUCTURE.bat` again
 
-If that works, use:
-```powershell
-python -m pip install -r requirements.txt
-```
+**If still freezing:**
+- Check internet connection (setup downloads packages)
+- Try running as Administrator
+- Check disk space (need ~200MB free)
 
 ---
 
-### "Permission denied"
+### "Import verification failed"
 
-**Error:** When running setup script
-
-**Solution:**
-1. Right-click PowerShell
-2. Select "Run as Administrator"
-3. Run setup script
-
-Or change execution policy:
-```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-```
-
----
-
-## Dependency Issues
-
-### "ModuleNotFoundError: No module named 'fuzzywuzzy'"
-
-**Error:** Script crashes with import error
+**Problem:** Setup completes but shows "ERROR: Import verification failed"
 
 **Solution:**
-1. Activate virtual environment:
+1. Delete venv: `C:\Repo\NemesisProject\venv`
+2. Run `1-SETUP-INFRASTRUCTURE.bat` again
+3. If still fails, manually verify:
    ```powershell
-   C:\Repo\NemesisProject\venv\Scripts\Activate.ps1
+   C:\Repo\NemesisProject\venv\Scripts\python.exe -c "import fuzzywuzzy; import requests; print('OK')"
    ```
+   Should print: `OK`
 
-2. Install missing package:
-   ```powershell
-   pip install fuzzywuzzy python-Levenshtein
-   ```
-
-3. Try again
-
----
-
-### "ImportError: requests"
-
-**Error:** Similar to above
-
-**Solution:**
+If it doesn't, reinstall dependencies manually:
 ```powershell
-pip install requests
+C:\Repo\NemesisProject\venv\Scripts\pip install -r C:\Repo\NemesisProject\requirements.txt
 ```
 
 ---
 
-## Authentication Issues
+## Project Creation Issues
 
-### "ASANA_PAT not found" or "401 Unauthorized"
+### "Project Created Successfully" but folder doesn't exist
 
-**Error:** Script fails with authentication error
+**Problem:** `2-CREATE-PROJECT.bat` says success but no folder appears
 
 **Solution:**
-1. Generate token: https://app.asana.com/-/profile_options/apps
-2. Create `.env` file in your project folder:
-   ```
-   ASANA_PAT=<your-token>
-   ```
-3. Make sure `.env` is in `.gitignore` (never commit)
-4. Try again
+1. Check the path: `c:\Repo\Projects\Project-{YourClientName}\`
+2. Make sure you typed the name correctly
+3. Refresh File Explorer (F5)
+4. If still missing, run `2-CREATE-PROJECT.bat` again with the same name
 
-**Check:**
-```powershell
-echo $env:ASANA_PAT
+---
+
+### "ERROR: Phase must be a number"
+
+**Problem:** Phase Number prompt rejected your input
+
+**Solution:**
+- You entered: letters, spaces, or special characters
+- Valid input: `1` or `2` or `3` (just the number)
+- Try again with only the number
+
+---
+
+### "ERROR: Failed to create project structure"
+
+**Problem:** Setup succeeded but project creation failed
+
+**Solution:**
+1. Run `1-SETUP-INFRASTRUCTURE.bat` again (venv may be corrupted)
+2. Run `2-CREATE-PROJECT.bat` again
+3. If still failing:
+   - Check disk space (need ~100MB free)
+   - Check permissions (need write access to `c:\Repo\Projects\`)
+   - Try with a different client name
+
+---
+
+## Meeting Notes Issues
+
+### Project Not Detected
+
+**Problem:** You type meeting notes but system says "Cannot detect project"
+
+**Example:**
+```
+New session meeting notes TWG
+[your notes...]
 ```
 
-If empty, set it:
-```powershell
-$env:ASANA_PAT = "your-token-here"
+System says: "Cannot detect project from this text"
+
+**Solution:**
+Make sure format includes project name clearly:
+- ✓ "New session meeting notes TWG"
+- ✓ "Meeting notes for TWG"
+- ✓ "notes: TWG"
+- ✓ "TWG meeting"
+- ✗ "notes from today" (no project name)
+- ✗ "t-w-g meeting" (broken name)
+
+**Try:**
+```
+New session meeting notes TWG
+
+[your notes here]
 ```
 
 ---
 
-### "Invalid token"
+### No Asana Tasks Found for Line Item
 
-**Error:** `401 Unauthorized`
+**Problem:** System searches but finds zero matching Asana tasks
 
-**Solution:**
-- Token may have expired
-- Regenerate at: https://app.asana.com/-/profile_options/apps
-- Update `.env` file
-- Try again
-
----
-
-## Hook Issues
-
-### "Hook not firing" (File saved but no sync)
-
-**Error:** Save file but nothing happens
-
-**Solution:**
-1. Verify `.claude/settings.json` exists in project root
-2. Check JSON syntax (use JSON validator)
-3. Verify folder pattern matches your notes location
-4. **Resave `.claude/settings.json`** to re-enable hook
-5. Save a test note file
-
-**Debug:**
-```powershell
-# Check settings.json syntax
-cd Project-<Client>
-cat .\.claude\settings.json | ConvertFrom-Json
+**Example:**
+```
+Line 1: "Some random text"
+No Asana tasks found matching this item.
+Enter task GID manually or [SKIP]:
 ```
 
-If error, JSON is malformed.
+**Causes & Solutions:**
+
+**Cause 1: No Asana tasks exist**
+- Solution: Create the task in Asana first, then re-run notes
+
+**Cause 2: Item text doesn't match any task names**
+- Solution: Use more specific task names
+  - ✗ "Entity workflow" (too vague, multiple matches)
+  - ✓ "Entity Management Workflow Phase 1" (specific)
+
+**Cause 3: Typo in item text**
+- Solution: Type exact task name from Asana
+  - Copy from Asana if possible
+
+**Cause 4: Abbreviation not recognized**
+- Solution: Use full names instead
+  - ✗ "BDT workflow" (abbreviation)
+  - ✓ "Business Development Team workflow" (full name)
+
+**Workaround:** Enter task GID manually:
+```
+Enter task GID manually or [SKIP]: 1215428532115696
+```
+(You'll be prompted to provide this)
 
 ---
 
-### "Hook path invalid"
+### Confirmation Prompt Stuck or Not Responding
 
-**Error:** Hook points to wrong script path
+**Problem:** System shows confirmation prompt but never proceeds
 
-**Solution:**
-Update `.claude/settings.json`:
-```json
-{
-  "hooks": [{
-    "run": "python C:\\Repo\\NemesisProject\\scripts\\asana-sync-enhanced.py --no-prompt --project-gid YOUR_GID"
-  }]
-}
+**Example:**
+```
+Line 1: "Q4 timeline"
+Detected: "Q4 Planning" (GID: 123456)
+→ Correct? [YES/NO]
+
+(waiting... nothing happens)
 ```
 
-Note: Use forward slashes OR escaped backslashes in JSON.
-
----
-
-## Sync Issues
-
-### "No tasks found" or "Cannot find task"
-
-**Error:** Script runs but says task doesn't exist
-
 **Solution:**
-1. Verify Asana project GID in `.claude/settings.json`
-2. Verify task exists in Asana
-3. Try explicit @task reference:
-   ```markdown
-   @task name:"Exact Task Name"
-   Your content.
-   ```
-4. Check Asana project URL matches GID:
-   ```
-   https://app.asana.com/0/WORKSPACE/GID/list
-   ```
+1. Type your response clearly:
+   - `YES` (press Enter)
+   - `NO` (press Enter)
+   - Or a GID number (press Enter)
+
+2. If still stuck:
+   - Close the session
+   - Reopen Claude Code
+   - Start over (notes are saved, you can re-paste)
 
 ---
 
-### "Wrong task synced"
+### Wrong Task Matched
 
-**Error:** Comment posted to wrong Asana task
+**Problem:** System suggests wrong Asana task for your line item
 
-**Solution:**
-- Auto-detection is ambiguous for your text
-- Use explicit @task syntax instead:
-  ```markdown
-  @task search:"Exact Task Name"
-  Your comment here.
-  ```
-
----
-
-### "Connection timeout"
-
-**Error:** Script hangs or fails with timeout
-
-**Solution:**
-1. Check internet connection
-2. Check Asana status: https://status.asana.com/
-3. Retry operation
-4. If persistent, check firewall/proxy settings
-
----
-
-## File Issues
-
-### "Cannot read file" or encoding errors
-
-**Error:** Script fails to read .md file
-
-**Solution:**
-1. Ensure file is UTF-8 encoded
-2. Check file path is correct
-3. Ensure file is not locked (not open in editor)
-4. Try different file
-
----
-
-### "No markdown files found"
-
-**Error:** Script says no files to process
-
-**Solution:**
-1. Create test file: `08 - Meeting Notes/test.md`
-2. Verify folder pattern matches in `.claude/settings.json`
-3. Run: `python scripts/asana-sync-enhanced.py --dry-run`
-
----
-
-## General Debugging
-
-### Run in verbose mode
-
-```powershell
-python C:\Repo\NemesisProject\scripts\asana-sync-enhanced.py --verbose --dry-run
+**Example:**
+```
+Line 1: "Hide Portfolio"
+Detected: "Show Portfolio" (wrong task!)
+→ Correct? [YES/NO]
 ```
 
-Shows detailed debug output.
+**Solution:**
+- Type `NO`
+- System skips this item
+- Or enter the correct task GID manually
+
+**To avoid this:**
+- Use complete, unambiguous item names
+- Avoid single words or abbreviations
+- Be specific: "Hide Portfolio Summary Feature" not just "Hide Portfolio"
 
 ---
 
-### Check audit log
+### File Not Created in 08 - Meeting Notes
 
-```powershell
-cd Project-<Client>
-type scripts\asana-sync.log
-# or
-tail -20 scripts\asana-sync.log  # Last 20 lines
+**Problem:** You type meeting notes but no file appears in the folder
+
+**Solution:**
+1. Check the folder exists: `Project-TWG/Phase 1/08 - Meeting Notes/`
+2. Make sure you're looking in the right project (did system detect the right one?)
+3. Refresh File Explorer (F5)
+4. Check the file was actually created (system should show summary)
+
+**If file still missing:**
+- Try again with a simpler project name
+- Check disk space
+- Check folder permissions
+
+---
+
+### "Processed 0 items"
+
+**Problem:** System says it processed 0 line items from your notes
+
+**Causes:**
+
+**Cause 1: No line items in format**
+- Solution: Use bullet points or clear structure
+  - ✗ "We discussed things and met with people"
+  - ✓ "- Item 1\n- Item 2\n- Item 3"
+
+**Cause 2: All items were skipped (no matches)**
+- Solution: Use explicit task GIDs or create tasks in Asana first
+
+**Cause 3: All items were answered NO**
+- Solution: Review the detections and answer YES to at least one
+
+---
+
+## Asana Matching Issues
+
+### Multiple Tasks Shown (Ambiguous Match)
+
+**Problem:** System finds several matching Asana tasks, unsure which one
+
+**Example:**
+```
+Line: "Entity workflow"
+Detected:
+  [0] Entity Management (GID: 111)
+  [1] Entity Design (GID: 222)
+  [2] Sub-Entity Mapping (GID: 333)
+→ Pick one or [SKIP]:
 ```
 
-Shows all sync activity.
+**Solution:**
+- Type the number of the correct task: `0` or `1` or `2`
+- Or type `SKIP` to skip this item
+
+**To avoid ambiguity:**
+- Use more specific item names
+- Include context: "Entity Management Workflow" not just "Entity"
 
 ---
 
-### Test manual sync
+## File & Folder Issues
 
-```powershell
-cd C:\Repo\Projects\Project-<Client>
-python C:\Repo\NemesisProject\scripts\asana-sync-enhanced.py --dry-run
-```
+### Can't Find Project-{Name} Folder
 
-Should show proposals without making changes.
+**Problem:** You created a project but can't find it on disk
+
+**Solution:**
+1. Check location: `c:\Repo\Projects\`
+2. Check exact spelling (case-sensitive on some systems)
+3. Refresh File Explorer (F5)
+4. Search Windows for `Project-{Name}`
+
+**If completely missing:**
+- Run `2-CREATE-PROJECT.bat` again
+- Use same client name and phase number
+- It will recreate the folder
 
 ---
 
-## Still Stuck?
+### "08 - Meeting Notes" Folder Missing
 
-1. **Check all three:**
-   - `.env` file exists with ASANA_PAT
-   - `.claude/settings.json` exists with correct GID
-   - Asana project exists and is accessible
+**Problem:** Project created but no "08 - Meeting Notes" folder
 
-2. **Run setup again:**
-   ```powershell
-   C:\Repo\NemesisProject\scripts\setup-infrastructure.ps1
+**Solution:**
+- This folder is created automatically by `2-CREATE-PROJECT.bat`
+- If missing, check full folder structure was created
+- All folders 00-08 should exist
+- If missing, delete project and recreate it
+
+---
+
+## Asana Connectivity Issues
+
+### "Asana check failed" (3-CHECK-ASANA.bat)
+
+**Problem:** `3-CHECK-ASANA.bat` shows red X instead of green ✓
+
+**Causes:**
+
+**Cause 1: No internet connection**
+- Solution: Check your internet, try again
+
+**Cause 2: Asana service down**
+- Solution: Check Asana status page, try again later
+
+**Cause 3: MCP connector not configured**
+- Solution: Verify Claude Code settings, check docs/SETUP.md
+
+---
+
+## File Encoding Issues
+
+### "UnicodeEncodeError" or garbled characters
+
+**Problem:** System shows encoding errors or strange characters in filenames
+
+**Solution:**
+- File was created with non-ASCII characters (é, ñ, 中文, etc.)
+- Use ASCII-only characters in project names and file names
+- Valid: "Project-TWG", "Q4-Planning-Phase-1"
+- Invalid: "Projet-Québec", "Q4-計画", "PhaseΩ"
+
+---
+
+## Still Not Working?
+
+**Last resort:**
+1. Delete everything and start fresh:
+   ```
+   1. Delete: C:\Repo\NemesisProject\venv
+   2. Delete: C:\Repo\Projects\Project-{YourName}
+   3. Run: 1-SETUP-INFRASTRUCTURE.bat
+   4. Run: 2-CREATE-PROJECT.bat
+   5. Try meeting notes again
    ```
 
-3. **Try explicit @task:**
-   ```markdown
-   @task search:"Task Name"
-   ```
-
-4. **Check logs:**
-   ```powershell
-   cat asana-sync.log
-   ```
+2. Check logs for error details
+3. See README.md for contact/support info
 
 ---
 
-## Common Error Messages
+## Quick Reference
 
-| Error | Cause | Fix |
-|-------|-------|-----|
-| `No such file or directory` | Wrong path | Check file exists |
-| `401 Unauthorized` | Invalid token | Update .env |
-| `ModuleNotFoundError` | Package not installed | Run `pip install` |
-| `JSON decode error` | Malformed settings.json | Fix JSON syntax |
-| `Connection refused` | Wrong GID | Verify GID in URL |
-| `timeout` | Network issue | Check connection |
+| Issue | Check First |
+|-------|-------------|
+| Setup fails | Python installed + in PATH? |
+| Project not created | Ran BOTH Step 1 AND Step 2? |
+| Project not detected | Included project name in text? |
+| No Asana matches | Does task exist in Asana? |
+| Wrong task matched | Try entering GID manually |
+| File not created | Refreshed File Explorer? |
+| Confirmation stuck | Did you type YES/NO and press Enter? |
 
 ---
 
-**Can't find your issue?** Check the documentation or try running with `--verbose` for more details.
+## Report a New Issue
+
+If you encounter a problem not listed here:
+1. Note the exact error message
+2. Note what you were doing
+3. Check README.md for support information
+
+See: [INDEX.md](INDEX.md) for navigation to other docs

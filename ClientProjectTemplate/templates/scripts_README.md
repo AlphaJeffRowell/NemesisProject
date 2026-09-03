@@ -1,19 +1,19 @@
 # Scripts
 
-This section contains project-specific scripts and utilities.
+This section contains utility scripts and automation.
 
 ## Contents
 
-- Deployment scripts
 - Build scripts
+- Deployment scripts
 - Database migration scripts
-- Data import/export scripts
-- Utility scripts
 - Testing scripts
+- Maintenance scripts
+- Data processing scripts
 
 ## Getting Started
 
-Add project-specific scripts here.
+Add any scripts or automation tools needed for the project. Include documentation on how to run each script.
 
 ---
 

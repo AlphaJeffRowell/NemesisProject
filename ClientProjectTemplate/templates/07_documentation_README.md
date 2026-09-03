@@ -1,20 +1,20 @@
 # Documentation
 
-This section contains user and system documentation.
+This section contains user guides and API documentation.
 
 ## Contents
 
-- User guides
-- System documentation
+- User guides and manuals
+- Administrator guides
 - API documentation
-- Architecture documentation
-- Operations documentation
-- Training materials
-- Knowledge base
+- System architecture documentation
+- Integration guides
+- Troubleshooting guides
+- FAQ
 
 ## Getting Started
 
-Add your documentation here.
+Document how to use and operate the solution. Include step-by-step guides for end users and administrators.
 
 ---
 

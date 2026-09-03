@@ -1,6 +1,6 @@
 @echo off
-REM Nemesis Project — Check Asana Connectivity
-REM Double-click this file to verify Asana is connected and all requirements are met
+REM Nemesis Project — Check Asana MCP Connector
+REM Double-click this file to verify Asana MCP connector is available
 
 setlocal enabledelayedexpansion
 
@@ -22,13 +22,13 @@ if %errorlevel% neq 0 (
 REM Run the connectivity check script
 echo.
 echo ============================================================
-echo  Nemesis Project — Asana Connectivity Check
+echo  Nemesis Project — Asana MCP Connector Check
 echo ============================================================
 echo.
-echo Checking Asana connection and requirements...
+echo Verifying Asana MCP connector is available...
 echo.
 
-powershell -NoProfile -ExecutionPolicy Bypass -Command "& '.\scripts\check-asana-connection.ps1'"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& '.\scripts\check-asana-mcp.ps1'"
 
 if %errorlevel% equ 0 (
     echo.

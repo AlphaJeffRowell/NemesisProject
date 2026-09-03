@@ -1,6 +1,6 @@
 @echo off
-REM Nemesis Project — One-Time Infrastructure Setup
-REM Double-click this file to run setup (checks Python, creates venv, installs deps)
+REM Nemesis Project — Email Integration Setup
+REM Double-click this file to run setup (checks Python, creates venv, installs email dependencies)
 
 setlocal enabledelayedexpansion
 
@@ -22,7 +22,7 @@ if %errorlevel% neq 0 (
 REM Run the setup script
 echo.
 echo ============================================================
-echo  Nemesis Project — Infrastructure Setup
+echo  Nemesis Project — Email Integration Setup
 echo ============================================================
 echo.
 echo Starting setup script...

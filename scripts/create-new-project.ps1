@@ -1,5 +1,5 @@
 # Nemesis Project — Create New Client Project
-# Run this to set up a new client project with all necessary configuration
+# Creates folder structure for client projects (no Asana config needed - MCP handles sync)
 
 Write-Host "=====================================" -ForegroundColor Cyan
 Write-Host "Create New Client Project" -ForegroundColor Cyan
@@ -52,7 +52,6 @@ if (-not $phaseNumber -match '^\d+$') {
 }
 
 $folderPattern = "08 - Meeting Notes"
-
 $projectRoot = "c:\Repo\Projects\Project-$clientName"
 $phaseFolder = Join-Path $projectRoot "Phase $phaseNumber"
 
@@ -67,27 +66,13 @@ if (Test-Path $phaseFolder) {
     }
 }
 
+# Create folder structure
 Write-Host ""
-Write-Host "Step 3: Asana Project GID (optional)" -ForegroundColor Yellow
-Write-Host ""
-
-$asanaGID = Get-UserInput -Prompt "Asana Project GID (from URL, or press Enter to skip)" -Default ""
-Write-Host "  (Asana GID: $asanaGID)" -ForegroundColor Gray
-
-Write-Host ""
-Write-Host "Step 4: Asana Personal Access Token (optional)" -ForegroundColor Yellow
-Write-Host ""
-
-$asanaPAT = Get-UserInput -Prompt "Your ASANA_PAT (or press Enter to skip)" -Default ""
-Write-Host "  (Token provided: $(if ($asanaPAT) { 'yes' } else { 'no' }))" -ForegroundColor Gray
-
-# Call ClientProjectTemplate to create folder structure and templates
-Write-Host ""
-Write-Host "Creating folder structure with templates..." -ForegroundColor Cyan
+Write-Host "Creating folder structure..." -ForegroundColor Cyan
 
 $clientProjectTemplatePath = "C:\Repo\NemesisProject\ClientProjectTemplate\create-structure.bat"
 if (Test-Path $clientProjectTemplatePath) {
-    & $clientProjectTemplatePath $clientName $phaseNumber $folderPattern $asanaGID $asanaPAT
+    & $clientProjectTemplatePath $clientName $phaseNumber $folderPattern
     if ($LASTEXITCODE -ne 0) {
         Write-Host "ERROR: Failed to create project structure" -ForegroundColor Red
         exit 1
@@ -98,52 +83,34 @@ if (Test-Path $clientProjectTemplatePath) {
 }
 
 $notesFolder = Join-Path $phaseFolder "08 - Meeting Notes"
-$scriptsFolder = Join-Path $phaseFolder "scripts"
 
-Write-Host ""
-Write-Host "Step 5: Creating configuration files..." -ForegroundColor Yellow
-
-$envFile = Join-Path $projectRoot ".env"
-try {
-    $envContent = "ASANA_PAT=$asanaPAT`n"
-    Set-Content -Path $envFile -Value $envContent -Encoding UTF8
-    Write-Host "[+] Created: .env" -ForegroundColor Green
-} catch {
-    Write-Host "ERROR: Failed to create .env: $_" -ForegroundColor Red
-    exit 1
-}
-
+# Create .claude folder and settings
 $claudeFolder = Join-Path $projectRoot ".claude"
-$settingsFile = Join-Path $claudeFolder "settings.json"
-
-try {
-    if (-not (Test-Path $claudeFolder)) {
-        New-Item -ItemType Directory -Path $claudeFolder -Force | Out-Null
-    }
-
-    $nemesisScriptPath = "C:\Repo\NemesisProject\scripts\asana-sync-enhanced.py"
-    $escapedPath = $nemesisScriptPath -replace '\\', '\\'
-
-    $hookCommand = "python `"$nemesisScriptPath`" --no-prompt --project-gid $asanaGID"
-
-    $settingsJson = @{
-        version = "1.0"
-        hooks = @(
-            @{
-                on = "file_write"
-                match = "**/$folderPattern/**/*.md"
-                run = $hookCommand
-            }
-        )
-    } | ConvertTo-Json -Depth 10
-
-    Set-Content -Path $settingsFile -Value $settingsJson -Encoding UTF8
-    Write-Host "[+] Created: .claude/settings.json" -ForegroundColor Green
-} catch {
-    Write-Host "ERROR: Failed to create settings.json: $_" -ForegroundColor Red
-    exit 1
+if (-not (Test-Path $claudeFolder)) {
+    New-Item -ItemType Directory -Path $claudeFolder -Force | Out-Null
 }
 
+$claudeSettingsFile = Join-Path $claudeFolder "settings.json"
+try {
+    $claudeSettingsContent = @"
+{
+  "version": "1.0",
+  "hooks": [
+    {
+      "on": "file_write",
+      "match": "**/08 - Meeting Notes/**/*.md",
+      "description": "Auto-process meeting notes on file save"
+    }
+  ]
+}
+"@
+    Set-Content -Path $claudeSettingsFile -Value $claudeSettingsContent -Encoding UTF8
+    Write-Host "[+] Created: .claude/settings.json (auto-processing on save)" -ForegroundColor Green
+} catch {
+    Write-Host "WARNING: Failed to create .claude/settings.json: $_" -ForegroundColor Yellow
+}
+
+# Create .gitignore
 $gitignoreFile = Join-Path $projectRoot ".gitignore"
 try {
     $gitignoreContent = ".env`nvenv/`n__pycache__/`n*.pyc`n.DS_Store`n"
@@ -154,102 +121,94 @@ try {
     exit 1
 }
 
+# Create project README
 $projectReadmeFile = Join-Path $phaseFolder "README.md"
 try {
     $readmeContent = @"
 # Project-$clientName - Phase $phaseNumber
 
-**Asana Project GID:** $asanaGID
+## Quick Start
 
-## Getting Started
+Open Claude Code in this folder and type:
 
-1. Drop meeting notes into: $notesFolder
-2. Notes are automatically synced to Asana
-3. Write naturally - auto-detection finds task references
+\`\`\`
+New session meeting notes $clientName
 
-## How Auto-Detection Works
+Your meeting notes...
+- Discussion point 1
+- Action item 1
+- Action item 2
+\`\`\`
 
-### Automatic (No Special Syntax Required)
-Bloomberg integration complete. Ready for production.
--> Auto-syncs to the Bloomberg task
+## What Happens Automatically
 
-### Explicit (Always Works)
-@task search:"Task Name"
-Your comment here.
--> Explicitly syncs to specified task
+1. **File Creation** — I create a timestamped file in \`08 - Meeting Notes/\`
+2. **Line Parsing** — I extract each bullet/action item
+3. **Asana Search** — I search Asana for matching tasks (fuzzy matching)
+4. **Confirmation** — I ask you to confirm each match
+5. **Posting** — I post confirmed items as comments on Asana tasks
 
-## File Location
+## Example Workflow
 
-All notes should go in: **08 - Meeting Notes**
+**You type:**
+\`\`\`
+New session meeting notes $clientName
 
-Subfolders within are OK:
-- 08 - Meeting Notes/Client Meetings/
-- 08 - Meeting Notes/Internal/
+Team planning meeting on 2026-09-03.
 
-## Manual Sync
+Discussed:
+- Q4 timeline confirmed
+- Technical requirements approved
 
-If you want to sync without using hooks:
+Action items:
+- Update project plan
+- Schedule review meeting
+- Prepare documentation
+\`\`\`
 
-cd $projectRoot
-python C:\Repo\NemesisProject\scripts\asana-sync-enhanced.py --dry-run
+**I respond with:**
+\`\`\`
+Detected task: "Q4 Planning" (GID: 123456)
+  → correct for "Q4 timeline confirmed"? [YES/NO]
 
-## Configuration
+Detected task: "Technical Review" (GID: 123457)
+  → correct for "Technical requirements approved"? [YES/NO]
 
-Your settings are stored in:
-- .env - Your ASANA_PAT (never commit this)
-- .claude/settings.json - Hook configuration
+... (confirmation prompts for each item)
 
-## Troubleshooting
+✓ Posted 6 items to 3 Asana tasks
+\`\`\`
 
-Hook not firing?
-- Save .claude/settings.json to re-enable
+## Folder Structure
 
-ASANA_PAT error?
-- Check .env file has your token
+- **00 - Project Overview** — High-level documentation
+- **01 - Requirements** — Functional and non-functional requirements
+- **02 - Technical Specs** — Implementation specifications
+- **03 - Architecture** — System architecture and design
+- **04 - Implementation** — Code, scripts, deployment files
+- **05 - Testing** — Test cases and test results
+- **06 - Deployment** — Deployment guides and checklists
+- **07 - Documentation** — User guides and API docs
+- **08 - Meeting Notes** — Meeting notes (auto-synced to Asana)
 
-Wrong task synced?
-- Use explicit @task syntax for clarity
+## No Setup Required
+
+✓ No Asana tokens
+✓ No .env files
+✓ No configuration
+✓ Just write naturally in Claude Code
+
+Asana MCP connector handles everything automatically.
 
 ---
 
-Ready to use. Start writing notes!
+Ready to use. Start writing meeting notes in Claude Code!
 "@
 
     Set-Content -Path $projectReadmeFile -Value $readmeContent -Encoding UTF8
     Write-Host "[+] Created: Phase folder README" -ForegroundColor Green
 } catch {
     Write-Host "ERROR: Failed to create project README: $_" -ForegroundColor Red
-    exit 1
-}
-
-$testNoteFile = Join-Path $notesFolder "Test_AutoDetect.md"
-try {
-    $testContent = @"
-# Test Auto-Detection
-
-This file tests the auto-detection system.
-
-## Auto-Detect Examples
-
-### Clear task name (should sync)
-Bloomberg integration testing complete.
-
-### Explicit reference (always works)
-@task search:"Test Task"
-Manual reference works.
-
-### Issue number
-#27
-
----
-
-Test: Run python C:\Repo\NemesisProject\scripts\asana-sync-enhanced.py --dry-run to see proposals.
-"@
-
-    Set-Content -Path $testNoteFile -Value $testContent -Encoding UTF8
-    Write-Host "[+] Created: Test note file" -ForegroundColor Green
-} catch {
-    Write-Host "ERROR: Failed to create test note: $_" -ForegroundColor Red
     exit 1
 }
 
@@ -261,20 +220,10 @@ Write-Host ""
 Write-Host "Project Details:" -ForegroundColor Cyan
 Write-Host "  Name:        Project-$clientName" -ForegroundColor Gray
 Write-Host "  Location:    $projectRoot" -ForegroundColor Gray
-Write-Host "  Asana GID:   $asanaGID" -ForegroundColor Gray
-Write-Host "  Folders:     $folderPattern" -ForegroundColor Gray
+Write-Host "  Phase:       Phase $phaseNumber" -ForegroundColor Gray
 Write-Host ""
 Write-Host "Next Steps:" -ForegroundColor Cyan
-Write-Host "1. Add .claude/settings.json to your project in Claude Code" -ForegroundColor Gray
-Write-Host "2. Start writing notes in: $notesFolder" -ForegroundColor Gray
-Write-Host "3. Notes sync to Asana automatically on save" -ForegroundColor Gray
+Write-Host "1. Open Claude Code and navigate to: $projectRoot" -ForegroundColor Gray
+Write-Host "2. Type naturally: New session meeting notes $clientName" -ForegroundColor Gray
+Write-Host "3. Paste your notes - Claude syncs to Asana automatically" -ForegroundColor Gray
 Write-Host ""
-Write-Host "Test the sync (optional):" -ForegroundColor Cyan
-Write-Host "  cd '$projectRoot'" -ForegroundColor Gray
-Write-Host "  python C:\Repo\NemesisProject\scripts\asana-sync-enhanced.py --dry-run" -ForegroundColor Gray
-Write-Host ""
-Write-Host "Files Created:" -ForegroundColor Cyan
-Write-Host "  .env (your token - never commit)" -ForegroundColor Gray
-Write-Host "  .claude/settings.json (hook config)" -ForegroundColor Gray
-Write-Host "  .gitignore (protect secrets)" -ForegroundColor Gray
-Write-Host "  README.md (project guide)" -ForegroundColor Gray

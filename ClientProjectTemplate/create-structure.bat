@@ -7,7 +7,7 @@ setlocal enabledelayedexpansion
 set SCRIPT_DIR=%~dp0
 cd /d "%SCRIPT_DIR%"
 
-powershell -NoProfile -ExecutionPolicy Bypass -Command "& '.\scripts\create-structure.ps1' -ClientName '%1' -PhaseNumber '%2' -FolderPattern '%3' -AsanaGID '%4' -AsanaPAT '%5'"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& '.\scripts\create-structure.ps1' -ClientName '%1' -PhaseNumber '%2' -FolderPattern '%3'"
 
 if %errorlevel% neq 0 (
     echo ERROR: Failed to create project structure

@@ -1,256 +1,329 @@
-# Nemesis Project — Asana Integration System
+# Nemesis Project — Natural Language Meeting Notes Sync
 
-**Automated notes-to-Asana sync for any client project.**
+**Type your meeting notes naturally. System automatically detects project, parses items, searches Asana, confirms matches, and posts. ZERO manual steps.**
 
 ## What Is This?
 
-A production-ready system that automatically syncs meeting notes to Asana tasks. Write naturally in Claude Code, and the system detects task references (with or without explicit `@task` markers) and updates Asana automatically.
+A production-ready system that syncs meeting notes to Asana tasks with **maximum automation + explicit user confirmation**.
 
 **Key Features:**
-- ✅ Auto-detect task names (no `@task` syntax required)
-- ✅ Backward compatible with explicit `@task` references
-- ✅ Works for any project (Project-<Client>)
-- ✅ Per-user authentication (ASANA_PAT tokens)
-- ✅ Claude Code hooks for automatic sync on file save
-- ✅ Email-to-notes integration (from meetingNotes@Alphafmc.com)
-- ✅ Full audit trail of all syncs
+- ✅ Natural-language input (just type in Claude Code)
+- ✅ Automatic project detection (TWG, BDT, Acme, etc.)
+- ✅ Line-item parsing (bullets, actions, discussions)
+- ✅ Asana task fuzzy matching
+- ✅ Per-item confirmation (YOU control what gets posted)
+- ✅ Smart grouping (one comment per task, no duplicates)
+- ✅ Email-to-notes integration (optional)
+- ✅ File automatically created — no manual steps
 
-## ⭐ Quick Start — EASIEST METHOD
+---
 
-### Step 1: Double-Click Setup
-Navigate to this folder and double-click:
+## ⭐ Quick Start (2 Setup Steps)
+
+### Step 1: Double-Click Python Setup
 ```
 1-SETUP-INFRASTRUCTURE.bat
 ```
-
-**What it does:**
-- ✓ Checks if Python 3.7+ is installed
-- ✓ Creates virtual environment
-- ✓ Installs all dependencies
-- ✓ Verifies installation
-
-**Wait for:** "Setup Complete!" message
+- Auto-installs Python if missing
+- Creates virtual environment
+- Installs dependencies
+- Wait for: "Setup Complete!"
 
 ### Step 2: Double-Click Project Creator
-Double-click:
 ```
 2-CREATE-PROJECT.bat
 ```
-
-**Follow the prompts:**
-- Client Name (e.g., TWG, BDT, Acme)
-- Phase Number (1, 2, 3, etc.)
-- Asana Project GID (from project URL)
-- Your ASANA_PAT (personal token)
-- Folder Pattern (where your notes live)
-
-**What it creates:**
-- `c:\Repo\Projects\Project-<Client>\Phase <N>\`
-- `.env` file (never committed to Git)
-- `.claude/settings.json` (hook configuration)
-- `.gitignore` (protects secrets)
-- Project README
-
-### Step 3: Start Writing Notes
-
-Drop notes into:
-```
-c:\Repo\Projects\Project-<Client>\Phase <N>\08 - Meeting Notes\
-```
-
-**Sync happens automatically** when you save files!
-
-Or send emails to `meetingNotes@Alphafmc.com` (CC/BCC with `[ProjectName]` in subject).
+- Asks: Client Name (e.g., TWG, BDT)
+- Asks: Phase Number (1, 2, 3, etc.)
+- Creates full folder structure
+- Wait for: "Project Created Successfully!"
 
 ---
 
-## Alternative: PowerShell Method
+## Now Use It — Just Type
 
-If you prefer command-line:
+Open Claude Code and type naturally:
 
-```powershell
-cd C:\Repo\NemesisProject
+```
+New session meeting notes TWG
 
-# One-time setup
-.\scripts\setup-infrastructure.ps1
+Met with team on 2026-09-03.
 
-# Create new project
-.\scripts\create-new-project.ps1
+Discussed:
+- Q4 timeline confirmed
+- Technical requirements approved
+- Ready for Phase 2
+
+Action items:
+- Update project plan
+- Schedule review meeting
+```
+
+**System automatically:**
+1. ✓ Creates file in `Project-TWG/Phase 1/08 - Meeting Notes/`
+2. ✓ Parses all items
+3. ✓ Searches Asana for matches
+4. ✓ Shows confirmation prompts:
+   ```
+   Line 1: "Q4 timeline confirmed"
+   Detected: "Q4 Planning" (GID: 123456)
+   → Is this correct? [YES/NO]
+   ```
+5. ✓ You confirm each match
+6. ✓ Groups by task
+7. ✓ Posts to Asana
+
+**That's it. Done.**
+
+---
+
+## How It Works
+
+### The 6-Phase Workflow
+
+**Phase 1: Detect Project**
+- User types: "meeting notes TWG"
+- System finds: `Project-TWG/Phase 1/`
+
+**Phase 2: Parse Items**
+- Extracts bullets, numbered items, action items
+- Creates list of {index, text}
+
+**Phase 3: Confirmation Loop (One Per Item)**
+- For each item, search Asana
+- Show detection with task name + GID
+- Wait for YES / NO / or alternate GID
+
+**Phase 4: Group by Task**
+- Collect YES responses
+- Group by task GID
+- Remove duplicates
+
+**Phase 5: Post to Asana**
+- One comment per task
+- Multiple items = one grouped comment
+- No duplicate posts
+
+**Phase 6: Summary**
+```
+✓ Processed 5 line items
+✓ Posted to 3 Asana tasks
+✓ File saved to: Project-TWG/Phase 1/08 - Meeting Notes/2026-09-03-Meeting-Notes.md
 ```
 
 ---
 
-## How Auto-Detection Works
+## Zero Configuration
 
-### Automatic (No Special Syntax)
-```markdown
-Bloomberg integration complete. Ready for production.
-```
-→ Auto-syncs to the "Bloomberg Integration #27" task
+✅ No Asana tokens or `.env` files  
+✅ No manual file creation  
+✅ No syntax requirements  
+✅ No Python knowledge needed  
 
-### Explicit (Always Works)
-```markdown
-@task search:"Task Name"
-Your comment here.
-```
-→ Explicitly syncs to specified task
-
-### Issue Number
-```markdown
-Fixed bug #27 in the integration flow.
-```
-→ Automatically finds task #27 (if unique)
-
-**Learn more:** See `docs/AUTO_DETECTION.md`
+System uses Asana MCP connector automatically.
 
 ---
 
 ## Documentation
 
-- **[QUICK_START.txt](QUICK_START.txt)** — Brain-dead simple guide (3 steps, no jargon)
-- **[docs/SETUP.md](docs/SETUP.md)** — Detailed infrastructure setup
-- **[docs/AUTO_DETECTION.md](docs/AUTO_DETECTION.md)** — How auto-detection works
-- **[email-integration/README.md](email-integration/README.md)** — Email-to-notes integration
-- **[docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)** — Common issues and solutions
-- **[DEPLOYMENT_SUMMARY.md](DEPLOYMENT_SUMMARY.md)** — What was created
+**Start Here:**
+- **[QUICK_START.txt](QUICK_START.txt)** — Beginner 3-step guide (5 min read)
+- **[docs/SETUP.md](docs/SETUP.md)** — Setup details and verification
 
-## Architecture
+**How to Use:**
+- **[MEETING-NOTES-WORKFLOW.md](MEETING-NOTES-WORKFLOW.md)** — Complete workflow guide with examples
+- **[SYSTEM-PROMPT-MEETING-NOTES.md](SYSTEM-PROMPT-MEETING-NOTES.md)** — Technical implementation details
 
-```
-c:\Repo\NemesisProject\           ← Central (this repo)
-├── 1-SETUP-INFRASTRUCTURE.bat   ← Double-click for setup
-├── 2-CREATE-PROJECT.bat         ← Double-click to create project
-├── scripts\
-│   ├── asana-sync-enhanced.py   ← Shared by all projects
-│   ├── setup-infrastructure.ps1 ← One-time setup script
-│   └── create-new-project.ps1   ← Project creation script
-├── requirements.txt              ← Python dependencies
-└── docs\                          ← Documentation
+**Reference:**
+- **[docs/INDEX.md](docs/INDEX.md)** — Navigation guide (find what you need)
+- **[docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)** — Common issues & fixes
+- **[docs/EMAIL-INTEGRATION.md](docs/EMAIL-INTEGRATION.md)** — Optional: send notes via email
 
-c:\Repo\Projects\
-├── Project-TWG\
-│   ├── Phase 1\
-│   ├── Phase 2\
-│   ├── .claude\settings.json     ← References shared script
-│   ├── .env                       ← User's personal token
-│   └── 08 - Meeting Notes\
-├── Project-BDT\
-│   └── ...similar structure
-└── Project-Nullpoint\
-    └── ...similar structure
-```
+---
 
 ## System Requirements
 
 - **Windows 10+**, **macOS**, or **Linux**
-- **Python 3.7+** (setup script checks and guides installation if needed)
-- **~500MB** free disk space
+- **Python 3.7+** (auto-installs if missing)
+- **~200MB** free disk space
 - **Internet connection**
-- **Asana account** with Personal Access Token
+- **Claude Code** (any version)
+- **Asana account** (free tier works)
 
-## How It Works
+---
 
-### Setup (One-Time)
-1. Double-click `1-SETUP-INFRASTRUCTURE.bat`
-2. Wait for "Setup Complete!" message
-3. Done! (Virtual environment created, dependencies installed)
+## Architecture
 
-### Project Creation (Per Client)
-1. Double-click `2-CREATE-PROJECT.bat`
-2. Answer prompts (Client Name, Phase, Asana GID, Token, Folders)
-3. Done! (Project folder created with all configuration)
+```
+c:\Repo\NemesisProject\              ← Central repo
+├── 1-SETUP-INFRASTRUCTURE.bat       ← Step 1: Setup Python
+├── 2-CREATE-PROJECT.bat             ← Step 2: Create project
+├── 3-CHECK-ASANA.bat                ← Verify MCP connector
+├── README.md ← You are here
+├── QUICK_START.txt
+├── MEETING-NOTES-WORKFLOW.md
+├── SYSTEM-PROMPT-MEETING-NOTES.md
+├── venv/                            ← Python environment
+├── scripts/
+├── ClientProjectTemplate/           ← Copied to new projects
+├── email-integration/               ← Optional email sync
+└── docs/
 
-### Using the System
-1. Drop notes into project's `08 - Meeting Notes` folder
-2. Write naturally: "Bloomberg integration complete"
-3. Save file → Hook fires → Sync to Asana automatically
+c:\Repo\Projects\                    ← Your projects (created by Step 2)
+├── Project-TWG/
+│   ├── Phase 1/
+│   │   ├── 00 - Project Overview/
+│   │   ├── ...
+│   │   └── 08 - Meeting Notes/  ← Your notes go here
+│   ├── Phase 2/
+│   ├── .claude/settings.json
+│   └── README.md
+├── Project-BDT/
+│   └── ...similar structure
+└── Project-Acme/
+    └── ...similar structure
+```
 
-**No manual:**
-- File editing
-- Python knowledge
-- Environment variables
-- Folder creation
+---
 
-## Key Features
+## Features
 
-### Auto-Detection
-- Write naturally in notes
-- System finds task references
-- Fuzzy matching with confidence scoring
-- Ambiguous matches show user options
+### 1. Natural Language Input
+Just type meeting notes naturally — no special syntax, no file creation.
 
-### Backward Compatible
-- Explicit `@task search:"Task"` syntax still works
-- Takes priority over auto-detection (100% confidence)
-- Guaranteed to sync when explicitly tagged
+### 2. Automatic Project Detection
+Recognizes:
+- "New session meeting notes TWG" → Project-TWG
+- "meeting notes for BDT" → Project-BDT
+- "notes: Acme" → Project-Acme
+- "Nullpoint meeting" → Project-Nullpoint
 
-### Multi-User
-- Each user has personal ASANA_PAT in `.env`
-- Tokens never committed to Git
-- Full audit trail (who synced what, when)
+### 3. Intelligent Line Parsing
+Extracts:
+- Bullet points (- item)
+- Numbered items (1. item)
+- Discussion sections
+- Action items sections
+- Decisions
 
-### Claude Code Hooks
-- Automatic sync on file save
-- No manual command execution needed
-- `--no-prompt` flag auto-approves (no user interaction)
+### 4. Fuzzy Asana Matching
+Finds tasks even with:
+- Typos ("Qe Planning" → "Q4 Planning")
+- Partial names ("Hide" → "Hide Portfolio Summary")
+- Abbreviations ("IA" → "Investment Accounting")
 
-### Production Ready
-- Comprehensive error handling
-- Full audit logging
-- Graceful failure modes
-- Clear error messages
+### 5. Per-Item User Confirmation
+Every match requires explicit YES/NO:
+```
+Line 1: "Q4 timeline"
+Detected: "Q4 Planning" (GID: 123456)
+→ Correct? [YES/NO]
+```
+
+You say YES/NO — you control what gets posted.
+
+### 6. Smart Grouping
+Prevents duplicate comments:
+```
+Item 1: "Q4 timeline" → Task 123456
+Item 4: "Timeline schedule" → Task 123456
+
+Result: ONE comment with both items
+        (not two separate comments)
+```
+
+### 7. Automatic File Creation
+File created automatically:
+- Path: `Project-{Name}/Phase {N}/08 - Meeting Notes/`
+- Name: `{YYYY-MM-DD}-Meeting-Notes.md`
+- Full content saved for reference
+
+---
+
+## Email Integration (Optional)
+
+**Send notes via email instead of typing:**
+
+1. Create email to: `meetingNotes@Alphafmc.com`
+2. Subject: `[TWG] Q4 Meeting Notes`
+3. Body: Your meeting notes
+4. Double-click `email-integration/sync-emails.bat`
+
+Automatically:
+- Routes to Project-TWG
+- Creates file in 08 - Meeting Notes/
+- Processes like typed notes
+
+See [docs/EMAIL-INTEGRATION.md](docs/EMAIL-INTEGRATION.md) for details.
+
+---
+
+## Examples
+
+### Example 1: Simple Status Update
+```
+New session meeting notes TWG
+
+- Completed Q4 timeline
+- Technical review passed
+- Ready for Phase 2
+```
+**Result:** 3 items, 3 confirmations, posted to 3 tasks
+
+### Example 2: Complex Meeting with Duplicates
+```
+architecture review for BDT
+
+Discussed new system:
+- Database schema approved
+- API design finalized
+- Security review completed
+
+Action items:
+- Update deployment docs
+- Notify stakeholders about API
+- Schedule next review
+```
+**Result:** 6 items parsed, items 2 & 5 both match "API Design" task → posted to 5 tasks (API Design gets 2 items in one comment)
+
+---
 
 ## Troubleshooting
 
-**Python not found?**
-→ Run `1-SETUP-INFRASTRUCTURE.bat` again (it will guide installation)
+**Something not working?** See [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
 
-**ASANA_PAT error?**
-→ Check `.env` file in your project folder has your token
-
-**Hook not firing?**
-→ Resave `.claude/settings.json` to re-enable hook
-
-**More help?**
-→ See `docs/TROUBLESHOOTING.md`
-
-## Deployment
-
-This project is ready to:
-- ✅ Push to GitHub immediately
-- ✅ Deploy to team members
-- ✅ Scale to unlimited projects
-- ✅ Use in production
-
-Everything is included:
-- ✅ Core Python script
-- ✅ Setup automation
-- ✅ Project creation automation
-- ✅ Complete documentation
-- ✅ Error handling
-- ✅ Audit logging
+Quick fixes:
+- **Project not detected** → Include project name in text
+- **No Asana matches** → Use more specific task names
+- **Wrong task matched** → Say NO, enter correct GID
+- **File not created** → Check project exists, refresh File Explorer
+- **Setup fails** → Python won't install — see TROUBLESHOOTING.md
 
 ---
 
-## Getting Started
+## Ready to Deploy?
 
-**Path 1: File-based notes (Recommended)**
-1. Double-click `1-SETUP-INFRASTRUCTURE.bat`
-2. Double-click `2-CREATE-PROJECT.bat`
-3. Drop notes into `Project-<Name>/Phase <N>/08 - Meeting Notes/`
-4. Notes sync to Asana automatically
-
-**Path 2: Email-based notes**
-1. Follow Path 1 first
-2. Double-click `sync-emails.bat` anytime to import emails
-3. Send emails to `meetingNotes@Alphafmc.com` with `[ProjectName]` in subject
-4. Notes automatically routed to correct project
-
-**Learning resources:**
-- **[QUICK_START.txt](QUICK_START.txt)** — Start here (3 simple steps)
-- **[docs/AUTO_DETECTION.md](docs/AUTO_DETECTION.md)** — How note detection works
-- **[email-integration/README.md](email-integration/README.md)** — Email integration guide
+This project is:
+- ✅ Production-ready
+- ✅ Fully documented
+- ✅ Tested end-to-end
+- ✅ Ready for GitHub
 
 ---
 
-**Ready to go.** Double-click the batch files or read `QUICK_START.txt`.
+## Getting Started Right Now
+
+**New here?** → Read [QUICK_START.txt](QUICK_START.txt) (2 min)
+
+**Ready to set up?** → Double-click:
+```
+1-SETUP-INFRASTRUCTURE.bat
+```
+
+**Need full details?** → See [docs/INDEX.md](docs/INDEX.md) for navigation
+
+**Questions?** → [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
+
+---
+
+Welcome to Nemesis Project. **Type once. Confirm matches. Done.**

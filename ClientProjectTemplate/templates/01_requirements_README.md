@@ -1,19 +1,19 @@
 # Requirements
 
-This section contains functional and non-functional requirements.
+This section contains functional and non-functional requirements for the project.
 
 ## Contents
 
 - Functional requirements
-- Non-functional requirements
+- Non-functional requirements (performance, security, scalability)
 - User stories
-- Business rules
-- Constraints and dependencies
 - Acceptance criteria
+- Constraints and assumptions
+- Dependencies
 
 ## Getting Started
 
-Add your requirements documentation here.
+Document all project requirements here. Be specific about what needs to be built and how it should behave.
 
 ---
 

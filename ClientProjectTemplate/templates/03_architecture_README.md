@@ -1,20 +1,20 @@
 # Architecture
 
-This section contains architecture design and diagrams.
+This section contains system architecture and design documentation.
 
 ## Contents
 
 - System architecture diagrams
 - Component design
 - Data flow diagrams
+- Integration architecture
+- Security architecture
 - Deployment architecture
-- Infrastructure requirements
-- Scalability considerations
-- Disaster recovery plan
+- High-level design decisions
 
 ## Getting Started
 
-Add your architecture documentation here.
+Document how the system will be designed and built. Include architectural diagrams and rationale for key design decisions.
 
 ---
 

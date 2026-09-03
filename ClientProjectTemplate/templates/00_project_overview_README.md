@@ -13,7 +13,7 @@ This section contains high-level project information and objectives.
 
 ## Getting Started
 
-Add your project overview documentation here.
+Add your project overview documentation here. This serves as the entry point for anyone joining the project.
 
 ---
 
