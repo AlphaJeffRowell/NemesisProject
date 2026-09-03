@@ -12,6 +12,7 @@ A production-ready system that automatically syncs meeting notes to Asana tasks.
 - ✅ Works for any project (Project-<Client>)
 - ✅ Per-user authentication (ASANA_PAT tokens)
 - ✅ Claude Code hooks for automatic sync on file save
+- ✅ Email-to-notes integration (from meetingNotes@Alphafmc.com)
 - ✅ Full audit trail of all syncs
 
 ## ⭐ Quick Start — EASIEST METHOD
@@ -59,6 +60,8 @@ c:\Repo\Projects\Project-<Client>\Phase <N>\08 - Meeting Notes\
 
 **Sync happens automatically** when you save files!
 
+Or send emails to `meetingNotes@Alphafmc.com` (CC/BCC with `[ProjectName]` in subject).
+
 ---
 
 ## Alternative: PowerShell Method
@@ -104,9 +107,10 @@ Fixed bug #27 in the integration flow.
 
 ## Documentation
 
-- **[START_HERE.txt](START_HERE.txt)** — Quick start guide
+- **[QUICK_START.txt](QUICK_START.txt)** — Brain-dead simple guide (3 steps, no jargon)
 - **[docs/SETUP.md](docs/SETUP.md)** — Detailed infrastructure setup
 - **[docs/AUTO_DETECTION.md](docs/AUTO_DETECTION.md)** — How auto-detection works
+- **[email-integration/README.md](email-integration/README.md)** — Email-to-notes integration
 - **[docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)** — Common issues and solutions
 - **[DEPLOYMENT_SUMMARY.md](DEPLOYMENT_SUMMARY.md)** — What was created
 
@@ -230,12 +234,23 @@ Everything is included:
 
 ## Getting Started
 
-**Pick your path:**
+**Path 1: File-based notes (Recommended)**
+1. Double-click `1-SETUP-INFRASTRUCTURE.bat`
+2. Double-click `2-CREATE-PROJECT.bat`
+3. Drop notes into `Project-<Name>/Phase <N>/08 - Meeting Notes/`
+4. Notes sync to Asana automatically
 
-- **Easiest:** Double-click `1-SETUP-INFRASTRUCTURE.bat` then `2-CREATE-PROJECT.bat`
-- **Experienced:** Run PowerShell scripts in `scripts/`
-- **Learning:** Start with `docs/AUTO_DETECTION.md` to understand features
+**Path 2: Email-based notes**
+1. Follow Path 1 first
+2. Double-click `sync-emails.bat` anytime to import emails
+3. Send emails to `meetingNotes@Alphafmc.com` with `[ProjectName]` in subject
+4. Notes automatically routed to correct project
+
+**Learning resources:**
+- **[QUICK_START.txt](QUICK_START.txt)** — Start here (3 simple steps)
+- **[docs/AUTO_DETECTION.md](docs/AUTO_DETECTION.md)** — How note detection works
+- **[email-integration/README.md](email-integration/README.md)** — Email integration guide
 
 ---
 
-**Ready to go.** Start with the batch files or read `START_HERE.txt`.
+**Ready to go.** Double-click the batch files or read `QUICK_START.txt`.
